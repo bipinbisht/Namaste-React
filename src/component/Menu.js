@@ -1,21 +1,49 @@
 import { useParams } from 'react-router-dom'
 import useFetchMenu from '../utility/useFetchMenu'
+import { useState, useEffect } from 'react'
+import RestaurantAccordion from './RestaurantAccordion'
 
 const Menu = () => {
-  const { id } = useParams()
+  const [localdata, setLocalData] = useState([])
+  const [showIndex, setShowIndex] = useState(null)
+  const { resId } = useParams()
+  const MENU_IMG =
+    'https://media-assets.swiggy.com/swiggy/image/upload/fl_lossy,f_auto,q_auto,h_600/'
 
-  const menu = useFetchMenu(id)
-  console.log(menu?.employee_name)
+  const menu = useFetchMenu(resId)
 
-  if (menu === null) {
+  useEffect(() => {
+    if (menu) {
+      console.log('inside setmenu')
+      setLocalData(menu)
+    }
+  }, [menu])
+
+  if (localdata === null) {
     return <div>Loading...</div>
   }
-  const { employee_name, employee_age } = menu
+  // console.log(localdata)
+
+  const category = localdata.filter((c) => {
+    return (
+      c?.card?.card?.['@type'] ===
+      'type.googleapis.com/swiggy.presentation.food.v2.NestedItemCategory'
+    )
+  })
+  console.log(category)
+
   return (
-    <div>
-      <h1>Menu</h1>
-      <h2>Employee Name {employee_name} </h2>
-      <h2>Employee Age {employee_age} </h2>
+    <div className="text-center">
+      <h1 className="font-bold my-6 text-2xl">Rest Name</h1>
+      <p className="font-bold text-lg">Cuisines</p>
+      {category.map((obj, index) => (
+        <RestaurantAccordion
+          key={index}
+          showItems={index === showIndex ? true : false}
+          setShowIndex={() => setShowIndex(index)}
+          data={obj?.card?.card}
+        />
+      ))}
     </div>
   )
 }

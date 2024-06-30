@@ -2,21 +2,36 @@ import ReactDOM from 'react-dom/client'
 import Header from './component/Header'
 import { createBrowserRouter, RouterProvider, Outlet } from 'react-router-dom'
 import Error from './component/Error'
-// import About from './component/About'
-// import Contact from './component/Contact'
 import Menu from './component/Menu'
-import React, { lazy, Suspense } from 'react'
+import React, { lazy, Suspense, useEffect, useState } from 'react'
+//Redux
+import { Provider } from 'react-redux'
+
 //lazy loading
 const Grocery = lazy(() => import('./component/Grocery'))
 const About = lazy(() => import('./component/About'))
 const Contact = lazy(() => import('./component/Contact'))
+const Cart = lazy(() => import('./component/Cart'))
 import Body from './component/Body'
+import appStore from './utility/appStore'
+
 const AppLayout = () => {
+  const [userName, setUserName] = useState()
+  //authentication
+  useEffect(() => {
+    //make an api call and send username and password
+    const data = {
+      name: 'Bipin',
+    }
+    setUserName(data.name)
+  }, [])
   return (
-    <div>
-      <Header />
-      <Outlet />
-    </div>
+    <Provider store={appStore}>
+      <div>
+        <Header />
+        <Outlet />
+      </div>
+    </Provider>
   )
 }
 
@@ -62,15 +77,22 @@ const appRouting = createBrowserRouter([
         ),
       },
       {
-        path: '/dynamic/:id',
+        path: '/restMenu/:resId',
         element: <Menu />,
       },
       {
         path: '/grocery',
         element: (
           <Suspense fallback={<h1>Loading...</h1>}>
-            {' '}
             <Grocery />
+          </Suspense>
+        ),
+      },
+      {
+        path: '/cart',
+        element: (
+          <Suspense fallback={<h1>Loading...</h1>}>
+            <Cart />
           </Suspense>
         ),
       },
